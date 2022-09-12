@@ -1,0 +1,25 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="SocialNetwork.Tests" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="SocialNetwork.Tests" />
+              <Rule Match="Any">
+                <Property Name="Class" Value="BlobRepUnitTest" />
+                <Property Name="Class" Value="ChatRepUnitTest" />
+                <Property Name="Class" Value="MessageRepUnitTest" />
+                <Property Name="Class" Value="PostRepUnitTest" />
+                <Property Name="Class" Value="RateRepUnitTest" />
+                <Property Name="Class" Value="UserRepUnitTest" />
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>

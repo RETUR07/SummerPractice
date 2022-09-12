@@ -1,0 +1,58 @@
+name : Docker-CI
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  Connection: Docker Hub
+pool:
+  name: default 
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:  
+  - job: Build
+    displayName: Build and push Docker images
+    steps:
+    
+    - task: DockerCompose@0
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: '$(Connection)'
+        dockerComposeFile: '**/docker-compose.yml'
+        dockerComposeFileArgs: |
+          ConnectionToBlob=$(SecretConnectionToBlob)
+          ConnectionToDB=$(DBConnection)
+          SecretJWTKey=$(JWTKey)
+        projectName: 'retur//'
+        qualifyImageNames: false
+        action: 'Run services'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker Hub'
+        command: 'tag'
+        arguments: 'retur_IdentityTokenServer retur/retur_IdentityTokenServer:$(Build.BuildId)'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker Hub'
+        command: 'tag'
+        arguments: 'retur_web retur/retur_web:$(Build.BuildId)'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker Hub'
+        repository: 'retur/retur_web:$(Build.BuildId)'
+        command: 'push'
+        tags: 
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker Hub'
+        repository: 'retur/retur_identity_token_server:$(Build.BuildId)'
+        command: 'push'
+        tags: 

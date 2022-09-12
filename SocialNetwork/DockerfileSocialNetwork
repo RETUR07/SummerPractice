@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /source
+
+COPY SocialNetwork/*.csproj ./SocialNetwork/
+COPY application/*.csproj ./application/
+COPY Entities/*.csproj ./Entities/
+COPY Repository/*.csproj ./Repository/
+
+COPY SocialNetwork/. ./SocialNetwork/
+COPY application/. ./application/
+COPY Entities/. ./Entities/
+COPY Repository/. ./Repository/
+
+WORKDIR /source/SocialNetwork/
+
+RUN dotnet publish -c release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
+EXPOSE 80
+WORKDIR /app
+COPY --from=build /app ./
+ENTRYPOINT ["dotnet", "SocialNetwork.dll"]

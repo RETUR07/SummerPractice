@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:   
+  web:
+    ports:
+      - "5050:80"
+    build:
+      context: ./
+      dockerfile: DockerfileSocialNetwork
+    volumes:
+      - C:\\temp:/app/Infrastructure/Certificate
+    environment:
+      - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/certificate.pfx
+      - Kestrel__Certificates__Default__Password=password
+      - JWT:Secret=${SecretJWTKey}
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings:sqlConnection=${ConnectionToDB}
+      - ConnectionStrings:AzureBlobStorage=${ConnectionToBlob}
+    restart: on-failure
+
+
+    
+  identity_token_server:
+    ports:
+      - "9001:81"
+    build:
+      context: ./
+      dockerfile: DockerfileIdentityServer4
+    volumes:
+      - C:\\temp:/app/Infrastructure/Certificate
+    environment:
+      - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/certificate.pfx
+      - Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_URLS=https://+:81
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings:sqlConnection=Data Source=host.docker.internal\SQLExpress, 1433; database=SocialNetworkDb; User ID=sa;Password=root;MultipleActiveResultSets=true;
+    restart: on-failure
+

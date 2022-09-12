@@ -1,0 +1,23 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /source
+
+COPY application/*.csproj ./application/
+COPY Entities/*.csproj ./Entities/
+COPY Repository/*.csproj ./Repository/
+COPY IdentityTokenServer/*.csproj ./IdentityTokenServer/
+
+COPY IdentityTokenServer/. ./IdentityTokenServer/
+COPY application/. ./application/
+COPY Entities/. ./Entities/
+COPY Repository/. ./Repository/
+
+WORKDIR /source/IdentityTokenServer/
+RUN dotnet publish -c release -o /app
+
+FROM mcr.microsoft.com/dotnet/sdk:5.0
+EXPOSE 81
+WORKDIR /app
+COPY --from=build /app ./
+RUN dotnet dev-certs https
+RUN dotnet dev-certs https --trust
+ENTRYPOINT ["dotnet", "SocialNetwork.IdentityTokenServer.dll"]
